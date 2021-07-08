@@ -1,0 +1,45 @@
+.App {
+  text-align: center;
+}
+#board {
+  position: relative;
+  padding: 30px;
+  z-index: 3;
+  background: rgb(255, 255, 255);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.App-logo {
+  /* height: 4vmin; */
+  pointer-events: none;
+}
+.blank {
+  /* background-color: green; */
+  margin: 1px;
+  /* border-top: 1px solid black; */
+  /* border-left: 1px solid black; */
+  height: 40px;
+  width: 40px;
+}
+li {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 10s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
