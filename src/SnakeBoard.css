@@ -12,11 +12,9 @@
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
-.App-logo {
-  /* height: 4vmin; */
-  pointer-events: none;
-}
+
 .blank {
+  pointer-events: none;
   /* background-color: green; */
   margin: 1px;
   /* border-top: 1px solid black; */
@@ -42,4 +40,13 @@ li {
   to {
     transform: rotate(360deg);
   }
+}
+.head {
+  position: relative;
+  z-index: 5;
+}
+.food,
+.body {
+  position: relative;
+  z-index: 1;
 }
