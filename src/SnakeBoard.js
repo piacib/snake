@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import "./SnakeBoard.css";
-import Logo from "./logo.svg";
-import Rocket from "./rocket.png";
+import Logo from "./media/logo.svg";
+import Rocket from "./media/rocket.png";
+import Asteroid from "./media/asteroid.svg";
 import { useArrowKeys } from "./useArrowKeys";
 import { useInterval } from "./useInterval";
 // grid size to be made adjustable
-const gridSize = 10;
+const gridSize = 20;
+const gridHeight = 10;
+const gridWidth = 20;
 // names
 const BLANK = "blank";
 const SNAKE = "snake";
@@ -19,8 +22,8 @@ const DOWN = "down";
 
 const randomPosition = () => {
   const position = {
-    x: Math.floor(Math.random() * gridSize),
-    y: Math.floor(Math.random() * gridSize),
+    y: Math.floor(Math.random() * gridHeight),
+    x: Math.floor(Math.random() * gridWidth),
   };
   return position;
 };
@@ -58,19 +61,18 @@ const GameOver = ({ score, reset }) => {
     </>
   );
 };
-
 export const SnakeBoard = ({
-  initialInterval = 300,
+  initialInterval = 250,
   initialSnake = [
-    { x: 0, y: 1 },
-    { x: 0, y: 0 },
+    { y: 0, x: 1 },
+    { y: 0, x: 0 },
   ],
   initialDirection = RIGHT,
 }) => {
   let initialRows = [];
-  for (let i = 0; i < gridSize; i++) {
+  for (let i = 0; i < gridHeight; i++) {
     initialRows.push([]);
-    for (let k = 0; k < gridSize; k++) {
+    for (let k = 0; k < gridWidth; k++) {
       initialRows[i].push(BLANK);
     }
   }
@@ -82,35 +84,35 @@ export const SnakeBoard = ({
   const [gameOver, setGameOver] = useState(false);
   const [interval, setInterval] = useState(initialInterval);
   //fix eslint warning
-  const memoizedChangeDirectionWithKeys = useCallback(
-    () => changeDirectionWithKeys,
-    [gameOver]
-  );
+  // const memoizedChangeDirectionWithKeys = useCallback(
+  //   () => changeDirectionWithKeys,
+  //   [gameOver]
+  // );
   const changeDirection = () => {
     const newRocket = [];
     switch (direction) {
       case LEFT:
         newRocket.push({
-          x: rocket[0].x,
-          y: (rocket[0].y - 1 + gridSize) % gridSize,
+          x: (rocket[0].x - 1 + gridWidth) % gridWidth,
+          y: rocket[0].y,
         });
         break;
       case RIGHT:
         newRocket.push({
-          x: rocket[0].x,
-          y: (rocket[0].y + 1) % 10,
+          x: (rocket[0].x + 1) % gridWidth,
+          y: rocket[0].y,
         });
         break;
       case UP:
         newRocket.push({
-          x: (rocket[0].x - 1 + gridSize) % gridSize,
-          y: rocket[0].y,
+          x: rocket[0].x,
+          y: (rocket[0].y - 1 + gridHeight) % gridHeight,
         });
         break;
       case DOWN:
         newRocket.push({
-          x: (rocket[0].x + 1) % gridSize,
-          y: rocket[0].y,
+          x: rocket[0].x,
+          y: (rocket[0].y + 1) % gridHeight,
         });
         break;
       default:
@@ -125,43 +127,31 @@ export const SnakeBoard = ({
       newRocket.pop();
     }
     newRocket[0].head = true;
-
     setRocket(newRocket);
     displayRocket();
   };
   useEffect(() => {
     hasDuplicates(rocket) && setGameOver(true);
   }, [rocket]);
-
   useEffect(() => {
     const endGame = () => {
-      document.removeEventListener(
-        "keydown",
-        memoizedChangeDirectionWithKeys,
-        true
-      );
+      document.removeEventListener("keydown", changeDirectionWithKeys, true);
       setInterval(null);
     };
-    console.log("render");
     gameOver === true
       ? endGame()
-      : document.addEventListener(
-          "keydown",
-          memoizedChangeDirectionWithKeys,
-          false
-        );
-  }, [gameOver, memoizedChangeDirectionWithKeys]);
+      : document.addEventListener("keydown", changeDirectionWithKeys, false);
+  }, [gameOver, changeDirectionWithKeys]);
   const displayRocket = () => {
     const newRows = initialRows;
     rocket.forEach((cell, idx) => {
       idx === 0
-        ? (newRows[cell.x][cell.y] = HEAD)
-        : (newRows[cell.x][cell.y] = SNAKE);
+        ? (newRows[cell.y][cell.x] = HEAD)
+        : (newRows[cell.y][cell.x] = SNAKE);
     });
-    newRows[food.x][food.y] = FOOD;
+    newRows[food.y][food.x] = FOOD;
     setRows(newRows);
   };
-
   useInterval(changeDirection, interval);
   const resetGame = () => {
     setGameOver(false);
@@ -169,37 +159,43 @@ export const SnakeBoard = ({
     setDirection(initialDirection);
     setInterval(initialInterval);
   };
-
+  const transform = (direction) => {
+    let directionObj = {
+      left: "rotate(225deg)",
+      right: "rotate(45deg)",
+      up: "rotate(-45deg)",
+      down: "rotate(135deg)",
+    };
+    return { transform: directionObj[direction] };
+  };
   const displayBoard = rows.map((row, rowNumber) => (
     <li key={rowNumber} className="row" id="testy">
       {row.map((square, squareNumber) => {
         switch (square) {
           case BLANK:
-            return <div className="blank App-logo"></div>;
+            return <div className="box"></div>;
           case SNAKE:
             return (
-              <img
-                className="blank App-logo body"
-                alt="snake body"
-                src={Logo}
-              />
+              <div className="box">
+                <img className="tail" src={Asteroid} alt="snake tail" />
+              </div>
             );
           case HEAD:
             return (
-              <img
-                className="blank App-logo head"
-                alt="react logo"
-                src={Rocket}
-              />
+              <div className="box">
+                <img
+                  style={transform(direction)}
+                  className="head"
+                  alt="react logo"
+                  src={Rocket}
+                />
+              </div>
             );
-
           case FOOD:
             return (
-              <img
-                className="blank App-logo food"
-                alt="react logo"
-                src={Logo}
-              />
+              <div className="box">
+                <img className="food" alt="react logo" src={Logo} />
+              </div>
             );
           default:
             return null;
@@ -207,16 +203,13 @@ export const SnakeBoard = ({
       })}
     </li>
   ));
-  // return (
-  //   <div className="center" id="board">
-  //     {displayRows}
-  //   </div>
-  // );
   return gameOver ? (
     <GameOver score={rocket.length} reset={() => resetGame()} />
   ) : (
-    <div className="center" id="board">
-      {displayBoard}
-    </div>
+    <>
+      <div className="center" id="board">
+        {displayBoard}
+      </div>
+    </>
   );
 };

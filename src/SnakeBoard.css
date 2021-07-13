@@ -3,7 +3,7 @@
 }
 #board {
   position: relative;
-  padding: 30px;
+  padding: 15px;
   z-index: 3;
   background: rgb(255, 255, 255);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
@@ -13,12 +13,11 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.blank {
+.box {
   pointer-events: none;
-  /* background-color: green; */
-  margin: 1px;
-  /* border-top: 1px solid black; */
-  /* border-left: 1px solid black; */
+  display: grid;
+  place-items: center;
+  border: 1px solid black;
   height: 40px;
   width: 40px;
 }
@@ -28,8 +27,8 @@ li {
   flex-direction: row;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 10s linear;
+  .food {
+    animation: App-logo-spin infinite 6s linear;
   }
 }
 
@@ -44,9 +43,16 @@ li {
 .head {
   position: relative;
   z-index: 5;
+  height: 30px;
 }
-.food,
-.body {
+.food {
+  height: 40px;
+  width: 40px;
   position: relative;
   z-index: 1;
+}
+.tail {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
 }
