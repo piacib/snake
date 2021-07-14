@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Options } from "./Options";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css";
+import { SnakeBoard } from "./SnakeBoard";
 ReactDOM.render(
   <React.StrictMode>
-    <Options />
+    <SnakeBoard />
   </React.StrictMode>,
   document.getElementById("root")
 );
