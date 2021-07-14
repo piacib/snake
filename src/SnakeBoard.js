@@ -19,7 +19,7 @@ const UP = "up";
 const DOWN = "down";
 
 //initial values
-const initialInterval = { normal: 250, fast: 150, insane: 50, slow: 650 };
+const intervals = { normal: 250, fast: 150, insane: 50, slow: 650 };
 const initialSnake = (size, position) => {
   const positionObj = {
     topLeft: [
@@ -45,13 +45,11 @@ const initialSnake = (size, position) => {
   };
   return positionObj[position];
 };
-const gridHeight = 10;
-const gridWidth = 10;
 
-const randomPosition = (gridHeight, gridWidth) => {
+const randomPosition = ({ height, width }) => {
   const position = {
-    y: Math.floor(Math.random() * gridHeight),
-    x: Math.floor(Math.random() * gridWidth),
+    y: Math.floor(Math.random() * height),
+    x: Math.floor(Math.random() * width),
   };
   return position;
 };
@@ -78,6 +76,7 @@ function hasDuplicates(arrayOfObjects) {
       .slice(idx + 1)
       .map((items) => (shallowEqual(x, items) ? (duplicates = true) : null))
   );
+  duplicates && console.log("dup", arrayOfObjects);
   return duplicates;
 }
 const gridGenerator = ({ height, width }) => {
@@ -152,19 +151,19 @@ const DisplayBoard = ({ rows, direction }) => {
 };
 
 export const SnakeBoard = () => {
-  const [size, setSize] = useState({ height: gridHeight, width: gridWidth });
+  const { value: height, bind: bindHeight } = useInput(10);
+  const { value: width, bind: bindWidth } = useInput(10);
+  // const [size, setSize] = useState({ height: height, width: width });
+  let size = { height, width };
   const [rows, setRows] = useState(gridGenerator(size));
   const [rocket, setRocket] = useState([
     { y: 0, x: 1 },
     { y: 0, x: 0 },
   ]);
-  const [food, setFood] = useState(randomPosition(size.height, size.width));
+  const [food, setFood] = useState(randomPosition(size));
   const [gameOver, setGameOver] = useState(false);
-  const [interval, setInterval] = useState(initialInterval.normal);
+  const [interval, setInterval] = useState(intervals.normal);
   const [clicked, setClicked] = useState(false);
-
-  const { value: height, bind: bindHeight } = useInput(10);
-  const { value: width, bind: bindWidth } = useInput(10);
   // const { value: startPosition, bind: bindStartPosition } =
   //   useInput("top-left");
   // const { value: startDirection, bind: bindStartDirection } = useInput(RIGHT);
@@ -172,27 +171,26 @@ export const SnakeBoard = () => {
     useArrowKeys(RIGHT);
   const [savedOptions, setSavedOptions] = useState({
     interval: interval,
-    height: height,
-    width: width,
     rocket: rocket,
     direction: direction,
   });
   const setRandomFoodPosition = () => {
-    setFood(randomPosition(size.height, size.width));
+    setFood(randomPosition(size));
   };
 
   const resetGame = () => {
     setGameOver(false);
-    // setRocket(initialSnake);
     setClicked(false);
-    // setDirection(initialDirection);
-    // setInterval(initialInterval);
+    setRocket(savedOptions.rocket);
+    setDirection(savedOptions.direction);
+    setInterval(savedOptions.interval);
     setRows(gridGenerator(size));
     setRandomFoodPosition();
   };
   // creates new rocket
   const displayRocket = () => {
     const newRows = gridGenerator(size);
+
     rocket.forEach((cell, idx) => {
       idx === 0
         ? (newRows[cell.y][cell.x] = HEAD)
@@ -239,7 +237,10 @@ export const SnakeBoard = () => {
     } else {
       newRocket.pop();
     }
+    console.log(newRocket);
     newRocket[0].head = true;
+    newRocket[1].head = false;
+
     setRocket(newRocket);
     displayRocket();
   };
@@ -266,7 +267,7 @@ export const SnakeBoard = () => {
     e.preventDefault();
     console.log(e.target);
     // setSavedOptions({ ...savedOptions });
-    setSize({ height: height, width: width });
+    //setSize({ height: height, width: width });
     resetGame();
     setClicked(!clicked);
   };
@@ -298,8 +299,12 @@ export const SnakeBoard = () => {
               name="speed"
               id="speed"
               onChange={(event) => {
-                setInterval(initialInterval[event.target.value]);
-                setSavedOptions({ ...savedOptions, interval: interval });
+                let initialInterval = intervals[event.target.value];
+                setInterval(initialInterval);
+                setSavedOptions({
+                  ...savedOptions,
+                  interval: initialInterval,
+                });
               }}
             >
               <option value="slow">Slow</option>
@@ -310,10 +315,14 @@ export const SnakeBoard = () => {
             <select
               name="startPosition"
               id="startPosition"
-              // value={""}
+              defaultValue="topRight"
               onChange={(event) => {
-                setRocket(initialSnake(size, event.target.value));
-                setSavedOptions({ ...savedOptions, rocket: rocket });
+                let initialRocket = initialSnake(size, event.target.value);
+                setRocket(initialRocket);
+                setSavedOptions({
+                  ...savedOptions,
+                  rocket: initialRocket,
+                });
               }}
             >
               <option value="topRight">Top Right</option>
@@ -325,11 +334,15 @@ export const SnakeBoard = () => {
             <select
               name="startDirection"
               id="startDirection"
-              defaultValue="top-right"
-              value={direction}
+              defaultValue="right"
+              // value={direction}
               onChange={(event) => {
-                setDirection(event.target.value);
-                setSavedOptions({ ...savedOptions, direction: direction });
+                let initialDirection = event.target.value;
+                setDirection(initialDirection);
+                setSavedOptions({
+                  ...savedOptions,
+                  direction: initialDirection,
+                });
               }}
             >
               <option value={RIGHT}>Right</option>
