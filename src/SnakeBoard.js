@@ -5,10 +5,7 @@ import Rocket from "./media/rocket.png";
 import Asteroid from "./media/asteroid.svg";
 import { useArrowKeys } from "./useArrowKeys";
 import { useInterval } from "./useInterval";
-// grid size to be made adjustable
-const gridSize = 20;
-const gridHeight = 10;
-const gridWidth = 20;
+
 // names
 const BLANK = "blank";
 const SNAKE = "snake";
@@ -20,7 +17,7 @@ const RIGHT = "right";
 const UP = "up";
 const DOWN = "down";
 
-const randomPosition = () => {
+const randomPosition = (gridHeight, gridWidth) => {
   const position = {
     y: Math.floor(Math.random() * gridHeight),
     x: Math.floor(Math.random() * gridWidth),
@@ -61,13 +58,17 @@ const GameOver = ({ score, reset }) => {
     </>
   );
 };
+
 export const SnakeBoard = ({
   initialInterval = 250,
   initialSnake = [
     { y: 0, x: 1 },
     { y: 0, x: 0 },
   ],
+  gridHeight = 15,
+  gridWidth = 15,
   initialDirection = RIGHT,
+  initialGameOver = false,
 }) => {
   let initialRows = [];
   for (let i = 0; i < gridHeight; i++) {
@@ -78,16 +79,29 @@ export const SnakeBoard = ({
   }
   const [rows, setRows] = useState(initialRows);
   const [rocket, setRocket] = useState(initialSnake);
-  const [food, setFood] = useState(randomPosition);
+  const [food, setFood] = useState(randomPosition(gridHeight, gridWidth));
   const [direction, setDirection, changeDirectionWithKeys] =
     useArrowKeys(initialDirection);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOver, setGameOver] = useState(initialGameOver);
   const [interval, setInterval] = useState(initialInterval);
+
   //fix eslint warning
   // const memoizedChangeDirectionWithKeys = useCallback(
   //   () => changeDirectionWithKeys,
   //   [gameOver]
   // );
+  const resetGame = () => {
+    setGameOver(false);
+    setRocket(initialSnake);
+    setDirection(initialDirection);
+    setInterval(initialInterval);
+    setRows(initialRows);
+    setFood(randomPosition(gridHeight, gridWidth));
+  };
+  useEffect(() => {
+    setGameOver(initialGameOver);
+    // setInterval(null);
+  }, [initialGameOver]);
   const changeDirection = () => {
     const newRocket = [];
     switch (direction) {
@@ -122,7 +136,7 @@ export const SnakeBoard = ({
       newRocket.push(cell);
     });
     if (rocket[0].x === food.x && rocket[0].y === food.y) {
-      setFood(randomPosition);
+      setFood(randomPosition(gridHeight, gridWidth));
     } else {
       newRocket.pop();
     }
@@ -153,12 +167,7 @@ export const SnakeBoard = ({
     setRows(newRows);
   };
   useInterval(changeDirection, interval);
-  const resetGame = () => {
-    setGameOver(false);
-    setRocket(initialSnake);
-    setDirection(initialDirection);
-    setInterval(initialInterval);
-  };
+
   const transform = (direction) => {
     let directionObj = {
       left: "rotate(225deg)",
