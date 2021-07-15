@@ -1,11 +1,52 @@
+:root {
+  --main-background: rgb(97, 218, 251);
+  --options-background: rgb(242, 111, 91);
+  --board-background: white;
+  --button-background: white;
+  --restart-transition-background: #212a22;
+}
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+#root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+body {
+  background-color: var(--main-background);
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+.center {
+  display: grid;
+  place-items: center;
+}
+
 .App {
   text-align: center;
 }
 #board {
   position: relative;
+  background: var(--board-background);
   padding: 15px;
   z-index: 3;
-  background: rgb(255, 255, 255);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -56,17 +97,31 @@ li {
 }
 .optionHeader {
   position: absolute;
-  width: 100%;
-  height: 5em;
+  height: 100%;
+  width: 10em;
   margin-bottom: auto;
   top: 0;
+  left: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
+
   padding-left: 1em;
 }
 .game-inputs {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: auto;
   border: 1px solid black;
+}
+.burger {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0 2em;
+  width: 5em;
 }
 
 .switch {
@@ -106,10 +161,10 @@ li {
 }
 
 input:checked + .slider {
-  background-color: #2196f3;
+  background-color: var(--main-background);
 }
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196f3;
+  box-shadow: 0 0 1px var(--main-background);
 }
 
 input:checked + .slider:before {
@@ -125,4 +180,27 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+.restart {
+  width: 7em;
+  height: 3em;
+  border-radius: 2em;
+  font-size: 1rem;
+  background-color: var(--button-background);
+}
+.restart {
+  transition-duration: 0.4s;
+}
+
+.restart:hover {
+  background-color: var(--restart-transition-background);
+  color: white;
+}
+
+select {
+  width: 9em;
+  background-color: var(--button-background);
+  border-radius: 4px;
+  height: 2rem;
+  margin: 0.5rem;
 }

@@ -1,18 +1,8 @@
 import { cellTypes } from "../constants";
+import { transformImageDirection } from "../functions";
 import Logo from "../media/logo.svg";
 import Rocket from "../media/rocket.png";
 import Asteroid from "../media/asteroid.svg";
-
-//rotate rocket to point in direction of movement
-const transform = (direction) => {
-  let directionObj = {
-    left: "rotate(225deg)",
-    right: "rotate(45deg)",
-    up: "rotate(-45deg)",
-    down: "rotate(135deg)",
-  };
-  return { transform: directionObj[direction] };
-};
 
 const DisplayBoard = ({ rows, direction, gridLines }) => {
   const grid = gridLines ? { border: "1px solid black" } : null;
@@ -34,7 +24,7 @@ const DisplayBoard = ({ rows, direction, gridLines }) => {
                 return (
                   <div className="box" style={grid}>
                     <img
-                      style={transform(direction)}
+                      style={transformImageDirection(direction)}
                       className="head"
                       alt="react logo"
                       src={Rocket}

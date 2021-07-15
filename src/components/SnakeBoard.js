@@ -4,86 +4,22 @@ import "../style/SnakeBoard.css";
 //hooks
 import { useArrowKeys } from "../hooks/useArrowKeys";
 import { useInterval } from "../hooks/useInterval";
-import { useInput } from "../hooks/useInput";
 //components
 import GameOver from "./GameOver";
 import DisplayBoard from "./DisplayBoard";
 //constants
 import { cellTypes, directions, intervals } from "../constants";
+import {
+  initialSnake,
+  randomPosition,
+  hasDuplicates,
+  gridGenerator,
+} from "../functions";
 
-//initial values
-const initialSnake = (size, position) => {
-  const positionObj = {
-    topLeft: [
-      { y: 0, x: 1 },
-      { y: 0, x: 0 },
-    ],
-    topRight: [
-      { y: 0, x: size.width - 2 },
-      { y: 0, x: size.width - 1 },
-    ],
-    bottomLeft: [
-      { y: size.height - 1, x: 1 },
-      { y: size.height - 1, x: 0 },
-    ],
-    bottomRight: [
-      { y: size.height - 1, x: size.width - 2 },
-      { y: size.height - 1, x: size.width - 1 },
-    ],
-    center: [
-      { y: Math.floor(size.height / 2), x: Math.ceil(size.width / 2) },
-      { y: Math.floor(size.height / 2), x: Math.ceil(size.width / 2) - 1 },
-    ],
-  };
-  return positionObj[position];
-};
-
-const randomPosition = ({ height, width }) => {
-  const position = {
-    y: Math.floor(Math.random() * height),
-    x: Math.floor(Math.random() * width),
-  };
-  return position;
-};
-function shallowEqual(object1, object2) {
-  const keys1 = Object.keys(object1);
-  const keys2 = Object.keys(object2);
-
-  if (keys1.length !== keys2.length) {
-    return false;
-  }
-
-  for (let key of keys1) {
-    if (object1[key] !== object2[key]) {
-      return false;
-    }
-  }
-
-  return true;
-}
-function hasDuplicates(arrayOfObjects) {
-  let duplicates = false;
-  arrayOfObjects.map((x, idx) =>
-    arrayOfObjects
-      .slice(idx + 1)
-      .map((items) => (shallowEqual(x, items) ? (duplicates = true) : null))
-  );
-  duplicates && console.log("dup", arrayOfObjects);
-  return duplicates;
-}
-const gridGenerator = ({ height, width }) => {
-  let initialRows = [];
-  for (let i = 0; i < height; i++) {
-    initialRows.push([]);
-    for (let k = 0; k < width; k++) {
-      initialRows[i].push(cellTypes.BLANK);
-    }
-  }
-  return initialRows;
-};
 const SnakeBoard = () => {
-  const { value: height, bind: bindHeight } = useInput(10);
-  const { value: width, bind: bindWidth } = useInput(10);
+  const [height] = useState(15);
+  const [width] = useState(15);
+
   const [gridLines, setGridLines] = useState(false);
   const [rows, setRows] = useState(gridGenerator({ height, width }));
   const [rocket, setRocket] = useState([
@@ -190,13 +126,12 @@ const SnakeBoard = () => {
       : document.addEventListener("keydown", changeDirectionWithKeys, false);
   }, [gameOver, changeDirectionWithKeys, endGame]);
 
-  let styles = clicked ? { backgroundColor: "rgb(242, 111, 91)" } : null;
+  let styles = clicked
+    ? { backgroundColor: "var(--options-background)" }
+    : null;
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(e.target);
-    console.log(gridLines);
-    // setSavedOptions({ ...savedOptions });
-    //setSize({ height: height, width: width });
+    console.log(height, width);
     resetGame();
     setClicked(!clicked);
   };
@@ -204,7 +139,6 @@ const SnakeBoard = () => {
     console.log("clicker", clicked);
     setClicked(!clicked);
     !clicked ? setGameOver(true) : resetGame();
-    // !clicked ? setInterval(null) : setInterval(initialInterval);
   };
   const displayForm = () => {
     return clicked ? { display: "block" } : { display: "none" };
@@ -214,6 +148,7 @@ const SnakeBoard = () => {
       <>
         <div className="optionHeader" style={styles}>
           <svg
+            className="burger"
             onClick={handleClick}
             viewBox="0 0 100 80"
             width="40"
@@ -245,6 +180,7 @@ const SnakeBoard = () => {
               <option value="fast">Fast</option>
               <option value="insane">Insane</option>
             </select>
+
             <select
               name="startPosition"
               id="startPosition"
@@ -285,24 +221,22 @@ const SnakeBoard = () => {
               <option value={directions.UP}>Up</option>
               <option value={directions.DOWN}>Down</option>
             </select>
-            <label>Grid Lines: </label>
-            <label className="switch">
-              <input
-                type="checkbox"
-                onChange={() => {
-                  setGridLines(!gridLines);
-                  console.log(gridLines);
-                }}
-                // {...bindGridLines}
-              />
-              <span className="slider round"></span>
-            </label>
 
-            <label>Height: </label>
-            <input type="number" id="height" max="20" {...bindHeight} />
-            <label>Width: </label>
-            <input type="number" id="width" max="20" {...bindWidth} />
-            <button type="submit">Submit</button>
+            <label>
+              Grid Lines:
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  onChange={() => {
+                    setGridLines(!gridLines);
+                  }}
+                />
+                <span className="slider round"></span>
+              </label>
+            </label>
+            <button className="restart" type="submit">
+              Submit
+            </button>
           </form>
         </div>
       </>

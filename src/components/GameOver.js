@@ -1,10 +1,12 @@
 const GameOver = ({ score, reset }) => {
   return (
-    <>
+    <div className="gameover-display">
       <div>Game over</div>
       <div>Score: {score}</div>
-      <button onClick={reset}>Restart</button>
-    </>
+      <button className="restart" onClick={reset}>
+        Restart
+      </button>
+    </div>
   );
 };
 
