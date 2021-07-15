@@ -1,25 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "./SnakeBoard.css";
-import Logo from "./media/logo.svg";
-import Rocket from "./media/rocket.png";
-import Asteroid from "./media/asteroid.svg";
-import { useArrowKeys } from "./hooks/useArrowKeys";
-import { useInterval } from "./hooks/useInterval";
-import { useInput } from "./hooks/useInput";
-
-// names
-const BLANK = "blank";
-const SNAKE = "snake";
-const FOOD = "food";
-const HEAD = "head";
-
-const LEFT = "left";
-const RIGHT = "right";
-const UP = "up";
-const DOWN = "down";
+//css
+import "../style/SnakeBoard.css";
+//hooks
+import { useArrowKeys } from "../hooks/useArrowKeys";
+import { useInterval } from "../hooks/useInterval";
+import { useInput } from "../hooks/useInput";
+//components
+import GameOver from "./GameOver";
+import DisplayBoard from "./DisplayBoard";
+//constants
+import { cellTypes, directions, intervals } from "../constants";
 
 //initial values
-const intervals = { normal: 250, fast: 150, insane: 50, slow: 650 };
 const initialSnake = (size, position) => {
   const positionObj = {
     topLeft: [
@@ -84,98 +76,34 @@ const gridGenerator = ({ height, width }) => {
   for (let i = 0; i < height; i++) {
     initialRows.push([]);
     for (let k = 0; k < width; k++) {
-      initialRows[i].push(BLANK);
+      initialRows[i].push(cellTypes.BLANK);
     }
   }
   return initialRows;
 };
-//rotate rocket to point in direction of movement
-const transform = (direction) => {
-  let directionObj = {
-    left: "rotate(225deg)",
-    right: "rotate(45deg)",
-    up: "rotate(-45deg)",
-    down: "rotate(135deg)",
-  };
-  return { transform: directionObj[direction] };
-};
-const GameOver = ({ score, reset }) => {
-  return (
-    <>
-      <div>Game over</div>
-      <div>Score: {score}</div>
-      <button onClick={reset}>Restart</button>
-    </>
-  );
-};
-const DisplayBoard = ({ rows, direction }) => {
-  return (
-    <div className="center" id="board">
-      {rows.map((row, rowNumber) => (
-        <li key={rowNumber} className="row" id="testy">
-          {row.map((square, squareNumber) => {
-            switch (square) {
-              case BLANK:
-                return <div className="box"></div>;
-              case SNAKE:
-                return (
-                  <div className="box">
-                    <img className="tail" src={Asteroid} alt="snake tail" />
-                  </div>
-                );
-              case HEAD:
-                return (
-                  <div className="box">
-                    <img
-                      style={transform(direction)}
-                      className="head"
-                      alt="react logo"
-                      src={Rocket}
-                    />
-                  </div>
-                );
-              case FOOD:
-                return (
-                  <div className="box">
-                    <img className="food" alt="react logo" src={Logo} />
-                  </div>
-                );
-              default:
-                return null;
-            }
-          })}
-        </li>
-      ))}
-    </div>
-  );
-};
-
-export const SnakeBoard = () => {
+const SnakeBoard = () => {
   const { value: height, bind: bindHeight } = useInput(10);
   const { value: width, bind: bindWidth } = useInput(10);
-  // const [size, setSize] = useState({ height: height, width: width });
-  let size = { height, width };
-  const [rows, setRows] = useState(gridGenerator(size));
+  const [gridLines, setGridLines] = useState(false);
+  const [rows, setRows] = useState(gridGenerator({ height, width }));
   const [rocket, setRocket] = useState([
     { y: 0, x: 1 },
     { y: 0, x: 0 },
   ]);
-  const [food, setFood] = useState(randomPosition(size));
+  const [food, setFood] = useState(randomPosition({ height, width }));
   const [gameOver, setGameOver] = useState(false);
   const [interval, setInterval] = useState(intervals.normal);
   const [clicked, setClicked] = useState(false);
-  // const { value: startPosition, bind: bindStartPosition } =
-  //   useInput("top-left");
-  // const { value: startDirection, bind: bindStartDirection } = useInput(RIGHT);
-  const [direction, setDirection, changeDirectionWithKeys] =
-    useArrowKeys(RIGHT);
+  const [direction, setDirection, changeDirectionWithKeys] = useArrowKeys(
+    directions.RIGHT
+  );
   const [savedOptions, setSavedOptions] = useState({
     interval: interval,
     rocket: rocket,
     direction: direction,
   });
   const setRandomFoodPosition = () => {
-    setFood(randomPosition(size));
+    setFood(randomPosition({ height, width }));
   };
 
   const resetGame = () => {
@@ -184,46 +112,47 @@ export const SnakeBoard = () => {
     setRocket(savedOptions.rocket);
     setDirection(savedOptions.direction);
     setInterval(savedOptions.interval);
-    setRows(gridGenerator(size));
+    setRows(gridGenerator({ height, width }));
     setRandomFoodPosition();
   };
-  // creates new rocket
-  const displayRocket = () => {
-    const newRows = gridGenerator(size);
 
+  // creates new rocket
+  const displayRocket = ({ height, width }) => {
+    const newRows = gridGenerator({ height, width });
+    //set head and body features of snake
     rocket.forEach((cell, idx) => {
       idx === 0
-        ? (newRows[cell.y][cell.x] = HEAD)
-        : (newRows[cell.y][cell.x] = SNAKE);
+        ? (newRows[cell.y][cell.x] = cellTypes.HEAD)
+        : (newRows[cell.y][cell.x] = cellTypes.SNAKE);
     });
-    newRows[food.y][food.x] = FOOD;
+    newRows[food.y][food.x] = cellTypes.FOOD;
     setRows(newRows);
   };
   const changeDirection = () => {
     const newRocket = [];
     switch (direction) {
-      case LEFT:
+      case directions.LEFT:
         newRocket.push({
-          x: (rocket[0].x - 1 + size.width) % size.width,
+          x: (rocket[0].x - 1 + width) % width,
           y: rocket[0].y,
         });
         break;
-      case RIGHT:
+      case directions.RIGHT:
         newRocket.push({
-          x: (rocket[0].x + 1) % size.width,
+          x: (rocket[0].x + 1) % width,
           y: rocket[0].y,
         });
         break;
-      case UP:
+      case directions.UP:
         newRocket.push({
           x: rocket[0].x,
-          y: (rocket[0].y - 1 + size.height) % size.height,
+          y: (rocket[0].y - 1 + height) % height,
         });
         break;
-      case DOWN:
+      case directions.DOWN:
         newRocket.push({
           x: rocket[0].x,
-          y: (rocket[0].y + 1) % size.height,
+          y: (rocket[0].y + 1) % height,
         });
         break;
       default:
@@ -237,12 +166,11 @@ export const SnakeBoard = () => {
     } else {
       newRocket.pop();
     }
-    console.log(newRocket);
     newRocket[0].head = true;
     newRocket[1].head = false;
 
     setRocket(newRocket);
-    displayRocket();
+    displayRocket({ height, width });
   };
 
   useInterval(changeDirection, interval);
@@ -266,6 +194,7 @@ export const SnakeBoard = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(e.target);
+    console.log(gridLines);
     // setSavedOptions({ ...savedOptions });
     //setSize({ height: height, width: width });
     resetGame();
@@ -294,7 +223,11 @@ export const SnakeBoard = () => {
             <rect y="30" width="100" height="20" rx="8"></rect>
             <rect y="60" width="100" height="20" rx="8"></rect>
           </svg>
-          <form style={displayForm()} onSubmit={(e) => handleSubmit(e)}>
+          <form
+            className="game-inputs"
+            style={displayForm()}
+            onSubmit={(e) => handleSubmit(e)}
+          >
             <select
               name="speed"
               id="speed"
@@ -315,9 +248,12 @@ export const SnakeBoard = () => {
             <select
               name="startPosition"
               id="startPosition"
-              defaultValue="topRight"
+              defaultValue="topLeft"
               onChange={(event) => {
-                let initialRocket = initialSnake(size, event.target.value);
+                let initialRocket = initialSnake(
+                  { height, width },
+                  event.target.value
+                );
                 setRocket(initialRocket);
                 setSavedOptions({
                   ...savedOptions,
@@ -335,7 +271,6 @@ export const SnakeBoard = () => {
               name="startDirection"
               id="startDirection"
               defaultValue="right"
-              // value={direction}
               onChange={(event) => {
                 let initialDirection = event.target.value;
                 setDirection(initialDirection);
@@ -345,11 +280,24 @@ export const SnakeBoard = () => {
                 });
               }}
             >
-              <option value={RIGHT}>Right</option>
-              <option value={LEFT}>Left</option>
-              <option value={UP}>Up</option>
-              <option value={DOWN}>Down</option>
+              <option value={directions.RIGHT}>Right</option>
+              <option value={directions.LEFT}>Left</option>
+              <option value={directions.UP}>Up</option>
+              <option value={directions.DOWN}>Down</option>
             </select>
+            <label>Grid Lines: </label>
+            <label className="switch">
+              <input
+                type="checkbox"
+                onChange={() => {
+                  setGridLines(!gridLines);
+                  console.log(gridLines);
+                }}
+                // {...bindGridLines}
+              />
+              <span className="slider round"></span>
+            </label>
+
             <label>Height: </label>
             <input type="number" id="height" max="20" {...bindHeight} />
             <label>Width: </label>
@@ -361,8 +309,9 @@ export const SnakeBoard = () => {
       {gameOver ? (
         <GameOver score={rocket.length} reset={() => resetGame()} />
       ) : (
-        <DisplayBoard rows={rows} direction={direction} />
+        <DisplayBoard rows={rows} direction={direction} gridLines={gridLines} />
       )}
     </>
   );
 };
+export default SnakeBoard;

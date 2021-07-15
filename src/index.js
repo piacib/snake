@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "./reportWebVitals";
-import "./index.css";
-import { SnakeBoard } from "./SnakeBoard";
+import "./style/index.css";
+import SnakeBoard from "./components/SnakeBoard";
 ReactDOM.render(
   <React.StrictMode>
     <SnakeBoard />
