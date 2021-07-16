@@ -17,8 +17,8 @@ import {
 } from "../functions";
 
 const SnakeBoard = () => {
-  const [height] = useState(15);
-  const [width] = useState(15);
+  const [height] = useState(14);
+  const [width] = useState(14);
 
   const [gridLines, setGridLines] = useState(false);
   const [rows, setRows] = useState(gridGenerator({ height, width }));
@@ -141,10 +141,11 @@ const SnakeBoard = () => {
     !clicked ? setGameOver(true) : resetGame();
   };
   const displayForm = () => {
-    return clicked ? { display: "block" } : { display: "none" };
+    return clicked ? { display: "flex" } : { display: "none" };
   };
   return (
     <>
+      <h1>Drifters</h1>
       <>
         <div className="optionHeader" style={styles}>
           <svg
@@ -222,7 +223,7 @@ const SnakeBoard = () => {
               <option value={directions.DOWN}>Down</option>
             </select>
 
-            <label>
+            <label className="grid-lines">
               Grid Lines:
               <label className="switch">
                 <input
@@ -243,7 +244,13 @@ const SnakeBoard = () => {
       {gameOver ? (
         <GameOver score={rocket.length} reset={() => resetGame()} />
       ) : (
-        <DisplayBoard rows={rows} direction={direction} gridLines={gridLines} />
+        <>
+          <DisplayBoard
+            rows={rows}
+            direction={direction}
+            gridLines={gridLines}
+          />
+        </>
       )}
     </>
   );

@@ -1,8 +1,8 @@
 const GameOver = ({ score, reset }) => {
   return (
     <div className="gameover-display">
-      <div>Game over</div>
-      <div>Score: {score}</div>
+      <h2>Game over</h2>
+      <h3>Score: {score}</h3>
       <button className="restart" onClick={reset}>
         Restart
       </button>

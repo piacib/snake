@@ -1,0 +1,62 @@
+@keyframes flickerAnimation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-o-keyframes flickerAnimation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-moz-keyframes flickerAnimation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes flickerAnimation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.star {
+  position: absolute;
+  background-color: white;
+  height: 1px;
+  width: 1px;
+
+  /* -webkit-animation: flickerAnimation .5s infinite;
+    -moz-animation: flickerAnimation .5s infinite;
+    -o-animation: flickerAnimation .5s infinite;
+    animation: flickerAnimation 1.5s infinite; */
+}
+
+.star-background {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}

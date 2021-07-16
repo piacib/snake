@@ -3,11 +3,18 @@ import { transformImageDirection } from "../functions";
 import Logo from "../media/logo.svg";
 import Rocket from "../media/rocket.png";
 import Asteroid from "../media/asteroid.svg";
+import MemoizedStarBackground from "./StarBackground";
 
 const DisplayBoard = ({ rows, direction, gridLines }) => {
-  const grid = gridLines ? { border: "1px solid black" } : null;
+  const grid = gridLines ? { border: "1px solid darkslategrey" } : null;
   return (
-    <div className="center" id="board">
+    <div className="center" id="board" style={{ display: "relative" }}>
+      <MemoizedStarBackground
+        fullScreen={false}
+        twinkleMin={2}
+        twinkleMax={5}
+        starNumber={100}
+      />
       {rows.map((row, rowNumber) => (
         <li key={rowNumber} className="row" id="testy">
           {row.map((square, squareNumber) => {
